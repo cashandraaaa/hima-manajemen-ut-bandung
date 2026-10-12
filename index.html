@@ -252,6 +252,32 @@ a{color:inherit;}
 .cal-legend-item{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-mid);}
 .cal-legend-item .dot{width:8px; height:8px; border-radius:50%;}
 #calDayDetail{margin-top:14px;}
+.cal-event-labels{display:flex;flex-direction:column;gap:2px;margin-top:4px;min-width:0;}
+.cal-event-label{font-size:10px;line-height:1.25;padding:2px 3px;border-radius:3px;background:var(--bg-2);color:var(--text-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:2px solid var(--blue);}
+.cal-event-more{font-size:9px;color:var(--text-mid);padding-left:3px;}
+@media(max-width:600px){.cal-event-label{font-size:8px;padding:2px 1px}.cal-event-labels{gap:1px}}
+
+/* ============ SHARED NOTES / REMINDERS ============ */
+.notes-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.9fr);gap:16px;align-items:start;}
+.notes-feed{display:flex;flex-direction:column;gap:10px;}
+.note-item{border:1px solid var(--border-soft);background:var(--card-2);border-radius:13px;padding:13px 14px;}
+.note-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.note-title{font-size:13px;font-weight:700;line-height:1.5;overflow-wrap:anywhere;}
+.note-body{font-size:12.5px;line-height:1.65;color:var(--text-mid);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;}
+.note-meta{display:flex;flex-wrap:wrap;gap:7px 12px;margin-top:10px;font-size:10.5px;color:var(--text-dim);}
+.note-tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:700;background:var(--blue-soft);color:var(--blue);white-space:nowrap;}
+.note-tag.reminder{background:var(--orange-soft);color:var(--orange)}
+.note-tag.keuangan{background:var(--pink-soft);color:var(--pink)}
+.note-tag.dokumen{background:var(--green-soft);color:var(--green)}
+.note-actions{display:flex;gap:5px;flex:none;}
+.note-actions button{border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:7px;padding:5px 7px;font-size:10px;}
+.note-actions button:hover{color:var(--pink);border-color:var(--pink)}
+.notes-form{display:flex;flex-direction:column;gap:10px;}
+.notes-form input,.notes-form textarea,.notes-form select{width:100%;border:1px solid var(--border);border-radius:10px;background:var(--bg-2);color:var(--text-hi);padding:10px 11px;font:12.5px var(--font-body);}
+.notes-form textarea{min-height:96px;resize:vertical;line-height:1.5;}
+.notes-form .btn-primary{width:100%;}
+.notes-readonly{font-size:11.5px;color:var(--text-dim);line-height:1.6;padding:12px;border-radius:10px;background:var(--bg-2);border:1px dashed var(--border);}
+@media(max-width:760px){.notes-layout{grid-template-columns:1fr}.notes-form textarea{min-height:82px}}
 
 /* ============ HERO GREETING ============ */
 .hero-greet{
@@ -299,6 +325,14 @@ table.data-table tr:hover td{background:rgba(255,255,255,0.015);}
 .cell-strong{font-weight:600; color:var(--text-hi);}
 .cell-muted{color:var(--text-dim); font-size:12px;}
 .row-actions{display:flex; gap:6px;}
+.status-inline-select{
+  max-width:150px; min-width:128px; padding:6px 8px; border-radius:8px;
+  border:1px solid var(--border); background:var(--bg-2); color:var(--text-hi);
+  font:600 11.5px var(--font-body); cursor:pointer;
+}
+.status-inline-select:disabled{opacity:.6;cursor:wait}
+.status-inline-select.saving{border-color:var(--blue)}
+
 .icon-btn{
   width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--card-2);
   color:var(--text-mid); font-size:13px; display:flex; align-items:center; justify-content:center;
@@ -675,6 +709,31 @@ table.data-table tr:hover td{background:rgba(255,255,255,0.015);}
           <div id="calDayDetail"></div>
         </div>
 
+        <div class="section-card" id="sharedNotesCard">
+          <div class="section-head">
+            <div><h3>📝 Catatan &amp; Reminder Bersama</h3><p>Update terbaru, informasi penting, dan hal yang perlu diingat semua pengurus.</p></div>
+            <span class="badge badge-berjalan" id="notesCountBadge">0 catatan</span>
+          </div>
+          <div class="notes-layout">
+            <div>
+              <div class="notes-feed" id="sharedNotesFeed"><div class="empty-state"><div class="em-ic">🗒️</div><p>Memuat catatan bersama…</p></div></div>
+            </div>
+            <div class="section-card" style="margin:0;padding:15px;background:var(--bg-2);">
+              <h4 style="font-size:13px;margin-bottom:12px;">✍️ Tambah Catatan / Reminder</h4>
+              <form class="notes-form" id="sharedNoteForm">
+                <input id="sharedNoteTitle" maxlength="120" placeholder="Judul singkat (opsional)" aria-label="Judul catatan">
+                <textarea id="sharedNoteBody" maxlength="3000" placeholder="Tulis update, pengumuman, atau hal yang perlu diingat…" required aria-label="Isi catatan"></textarea>
+                <select id="sharedNoteCategory" aria-label="Kategori catatan">
+                  <option value="Update">Update</option><option value="Reminder">Reminder</option><option value="Proker">Proker</option><option value="Rapat">Rapat</option><option value="Dokumen">Dokumen</option><option value="Keuangan">Keuangan</option><option value="Informasi" selected>Informasi</option><option value="Lainnya">Lainnya</option>
+                </select>
+                <label for="sharedNoteDate" style="font-size:11px;color:var(--text-mid);">Tanggal pengingat (opsional)</label>
+                <input id="sharedNoteDate" type="date" aria-label="Tanggal pengingat">
+                <button class="btn-primary" type="submit" id="sharedNoteSubmit">Simpan Catatan</button>
+              </form>
+              <div class="notes-readonly hidden" id="sharedNotesReadOnly">Login diperlukan untuk menambahkan catatan. Semua pengguna yang login dapat menulis; penghapusan dibatasi untuk Admin, Sekretaris, dan Humas sesuai izin.</div>
+            </div>
+          </div>
+        </div>
 
         <div class="section-card mobile-recent-card" id="mobileRecentCard">
           <div class="section-head">
@@ -1088,6 +1147,7 @@ function seedData(){
   ];
   return {
     activities: acts,
+    notes: [],
     users: [],
     audit: [],
     backups: [],
@@ -1104,6 +1164,7 @@ function loadState(){
   }catch(e){ STATE = null; }
   if(!STATE) STATE = seedData();
   if(!STATE.settings) STATE.settings = seedData().settings;
+  if(!Array.isArray(STATE.notes)) STATE.notes = [];
 }
 function saveState(){
   // UI-only cache. Kegiatan, audit, dan akun tidak lagi bergantung pada localStorage.
@@ -1127,11 +1188,20 @@ async function syncActivities(){
   return STATE.activities;
 }
 
+async function syncSharedNotes(){
+  const {data,error}=await supabaseClient.from('shared_notes')
+    .select('id,title,body,category,remind_at,created_by,created_by_name,created_at,updated_at')
+    .order('created_at',{ascending:false}).limit(100);
+  if(error) throw error;
+  STATE.notes=(data||[]).map(n=>({id:n.id,title:n.title||'',body:n.body||'',category:n.category||'Informasi',remindAt:n.remind_at||'',createdBy:n.created_by,createdByName:n.created_by_name||'Pengguna',createdAt:n.created_at,updatedAt:n.updated_at||n.created_at}));
+  return STATE.notes;
+}
+
 let realtimeChannel=null;
 async function refreshCentralRealtime(){
   try{
-    await syncActivities();
-    renderActivityTable(); renderTimeline(); renderStats(); renderCalendar(); renderAttachments();
+    await Promise.all([syncActivities(),syncSharedNotes()]);
+    renderActivityTable(); renderTimeline(); renderStats(); renderCalendar(); renderAttachments(); renderSharedNotes();
     await renderRightPanel();
     if(currentUser?.role==='Admin') await renderAuditFeed();
   }catch(err){ console.error('Realtime central refresh error:',err); }
@@ -1141,6 +1211,9 @@ function subscribeRealtime(){
     if(realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
     realtimeChannel=supabaseClient.channel('hima-central-sync')
       .on('postgres_changes',{event:'*',schema:'public',table:'activities'},async()=>{ await refreshCentralRealtime(); })
+      .on('postgres_changes',{event:'*',schema:'public',table:'shared_notes'},async()=>{
+        try{ await syncSharedNotes(); renderSharedNotes(); }catch(err){ console.error('Shared notes realtime refresh error:',err); }
+      })
       .on('postgres_changes',{event:'*',schema:'public',table:'audit_logs'},async()=>{
         if(currentUser?.role==='Admin') await renderAuditFeed();
         if(currentUser?.role==='Admin') await renderRightPanel();
@@ -1465,7 +1538,7 @@ function renderCalendar(){
     }
     const cell = document.createElement('div');
     cell.className = 'cal-cell' + (evs.length? ' has-event':'') + (colorClass? ' '+colorClass:'') + (iso===todayStr? ' today':'') + (iso===calSelectedDate? ' selected':'');
-    cell.innerHTML = `<div class="cal-daynum">${d}</div>${evs.length>=2? '<span class="cal-multi-flag" title="2 atau lebih kegiatan">●</span>':''}<div class="cal-dots">${evs.slice(0,4).map(e=>`<span class="cal-dot" style="background:${STATUS_COLOR[e.status]||'var(--blue)'}" title="${e.status}"></span>`).join('')}</div>`;
+    cell.innerHTML = `<div class="cal-daynum">${d}</div>${evs.length>=2? '<span class="cal-multi-flag" title="2 atau lebih kegiatan">●</span>':''}<div class="cal-dots">${evs.slice(0,4).map(e=>`<span class="cal-dot" style="background:${STATUS_COLOR[e.status]||'var(--blue)'}" title="${escapeHtml(e.nama)} — ${escapeHtml(e.status||'Belum ada status')}"></span>`).join('')}</div>${evs.length?`<div class="cal-event-labels">${evs.slice(0,2).map(e=>`<div class="cal-event-label" title="${escapeHtml(e.nama)} · ${escapeHtml(e.status||'Belum ada status')}">${escapeHtml(e.nama)}</div>`).join('')}${evs.length>2?`<div class="cal-event-more">+${evs.length-2} lagi</div>`:''}</div>`:''}`;
     if(evs.length) cell.addEventListener('click', ()=>{ calSelectedDate = iso; renderCalendar(); renderCalDayDetail(iso); });
     grid.appendChild(cell);
   }
@@ -1478,13 +1551,80 @@ function renderCalDayDetail(iso){
     <div class="tl-card" style="margin-bottom:8px;">
       <h4>${escapeHtml(e.nama)}</h4>
       <div class="tl-meta">
-        <span class="badge badge-${statusClass(e.status)}">${e.status}</span>
-        <span>🏷️ ${e.divisi}</span>
+        <span class="badge badge-${statusClass(e.status)}">${escapeHtml(e.status||'Belum ada status')}</span>
+        <span>🏷️ ${escapeHtml(e.divisi||'Belum ditentukan')}</span>
         <span>👤 ${escapeHtml(e.pic)}</span>
       </div>
     </div>
   `).join('');
 }
+function noteCategoryClass(category){
+  const c=String(category||'').toLowerCase();
+  if(c==='reminder'||c==='rapat') return 'reminder';
+  if(c==='keuangan') return 'keuangan';
+  if(c==='dokumen') return 'dokumen';
+  return '';
+}
+function canPostSharedNote(){
+  // Semua pengguna yang berhasil login boleh menambahkan catatan bersama.
+  return !!currentUser;
+}
+function canDeleteSharedNote(note){
+  const role=normalizeRole(currentUser?.role);
+  return role==='Admin' || (['Sekretaris','Humas'].includes(role) && String(note.createdBy)===String(currentUser?.id));
+}
+function renderSharedNotes(){
+  const feed=document.getElementById('sharedNotesFeed');
+  const form=document.getElementById('sharedNoteForm');
+  const readOnly=document.getElementById('sharedNotesReadOnly');
+  if(!feed) return;
+  const notes=Array.isArray(STATE?.notes)?STATE.notes:[];
+  const count=document.getElementById('notesCountBadge');
+  if(count) count.textContent=`${notes.length} catatan`;
+  if(form){form.classList.toggle('hidden',!canPostSharedNote());}
+  if(readOnly) readOnly.classList.toggle('hidden',canPostSharedNote());
+  if(!notes.length){feed.innerHTML='<div class="empty-state"><div class="em-ic">🗒️</div><p>Belum ada catatan. Update dan reminder akan muncul di sini.</p></div>';return;}
+  feed.innerHTML=notes.map(n=>{
+    const title=(n.title||'').trim() || n.category || 'Catatan';
+    const remind=n.remindAt ? `⏰ Pengingat: ${fmtDate(n.remindAt)}` : '';
+    const date=n.createdAt ? fmtDateTime(n.createdAt) : '';
+    const del=canDeleteSharedNote(n)?`<div class="note-actions"><button type="button" data-delete-note="${escapeHtml(String(n.id))}" title="Hapus catatan">Hapus</button></div>`:'';
+    return `<article class="note-item"><div class="note-top"><div style="min-width:0;flex:1"><div class="note-title">${escapeHtml(title)}</div><span class="note-tag ${noteCategoryClass(n.category)}">${escapeHtml(n.category||'Informasi')}</span></div>${del}</div><div class="note-body">${escapeHtml(n.body||'')}</div><div class="note-meta"><span>👤 ${escapeHtml(n.createdByName||'Pengguna')}</span><span>🕒 ${escapeHtml(date)}</span>${remind?`<span>${escapeHtml(remind)}</span>`:''}</div></article>`;
+  }).join('');
+  feed.querySelectorAll('[data-delete-note]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const note=notes.find(n=>String(n.id)===String(btn.dataset.deleteNote));
+    if(!note || !canDeleteSharedNote(note)) return;
+    if(!confirm(`Hapus catatan “${(note.title||note.category||'Catatan').replace(/[\r\n]/g,' ').slice(0,80)}”?`)) return;
+    btn.disabled=true;btn.textContent='…';
+    try{
+      const {error}=await supabaseClient.from('shared_notes').delete().eq('id',note.id);
+      if(error) throw error;
+      STATE.notes=STATE.notes.filter(n=>String(n.id)!==String(note.id));renderSharedNotes();toast('Catatan berhasil dihapus.');
+    }catch(err){console.error('Delete shared note error:',err);toast(`Catatan gagal dihapus: ${err?.message||'periksa izin database.'}`,true);btn.disabled=false;btn.textContent='Hapus';}
+  }));
+}
+
+document.getElementById('sharedNoteForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!canPostSharedNote()){toast('Kamu belum punya akses untuk menambahkan catatan.',true);return;}
+  const title=document.getElementById('sharedNoteTitle').value.trim();
+  const body=document.getElementById('sharedNoteBody').value.trim();
+  const category=document.getElementById('sharedNoteCategory').value;
+  const remindAt=document.getElementById('sharedNoteDate').value||null;
+  if(!body){toast('Isi catatannya dulu ya.',true);return;}
+  const submit=document.getElementById('sharedNoteSubmit');
+  submit.disabled=true;submit.textContent='Menyimpan…';
+  try{
+    const payload={title,body,category,remind_at:remindAt,created_by:currentUser.id,created_by_name:currentUser.name,updated_at:new Date().toISOString()};
+    const {data,error}=await supabaseClient.from('shared_notes').insert(payload).select('id,title,body,category,remind_at,created_by,created_by_name,created_at,updated_at').single();
+    if(error) throw error;
+    STATE.notes.unshift({id:data.id,title:data.title||'',body:data.body,category:data.category,remindAt:data.remind_at||'',createdBy:data.created_by,createdByName:data.created_by_name,createdAt:data.created_at,updatedAt:data.updated_at});
+    e.target.reset();document.getElementById('sharedNoteCategory').value='Informasi';renderSharedNotes();toast('Catatan berhasil dibagikan ke dashboard.');
+    void addAudit('TAMBAH CATATAN',`Menambahkan catatan bersama: ${(title||category).slice(0,100)}`);
+  }catch(err){console.error('Create shared note error:',err);toast(`Catatan gagal disimpan: ${err?.message||'periksa koneksi atau izin database.'}`,true);}
+  finally{submit.disabled=false;submit.textContent='Simpan Catatan';}
+});
+
 document.getElementById('calPrev').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()-1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()+1); renderCalendar(); });
 
@@ -1606,15 +1746,48 @@ function renderActivityTable(){
       <td>${a.divisi}</td>
       <td class="cell-strong">${escapeHtml(a.nama)}</td>
       <td>${a.tanggal ? displayDateRange(a) : '<span class="badge badge-draft">Belum ditentukan</span>'}</td>
-      <td><span class="badge badge-${statusClass(a.status)}">${a.status}</span></td>
+      <td>${canEdit ? `<select class="status-inline-select" data-status-act="${a.id}" aria-label="Ubah status ${escapeHtml(a.nama)}">
+        ${['Belum ada status','Berlangsung','Selesai','Reschedule','Batal/Cancel'].map(st=>`<option value="${st}" ${a.status===st || (st==='Berlangsung' && a.status==='Berjalan') || (st==='Belum ada status' && !a.status) ? 'selected':''}>${st}</option>`).join('')}
+      </select>` : `<span class="badge badge-${statusClass(a.status)}">${escapeHtml(a.status||'Belum ada status')}</span>`}</td>
       <td>${escapeHtml(a.pic)}</td>
       <td><div class="row-actions">${actions}</div></td>
     </tr>`;
   }).join('');
 
+  tbody.querySelectorAll('[data-status-act]').forEach(sel=>sel.addEventListener('change', ()=>updateActivityStatus(sel.dataset.statusAct, sel)));
   tbody.querySelectorAll('[data-view-act]').forEach(b=>b.addEventListener('click', ()=>viewActivity(b.dataset.viewAct)));
   tbody.querySelectorAll('[data-edit-act]').forEach(b=>b.addEventListener('click', ()=>openActivityModal(b.dataset.editAct)));
   tbody.querySelectorAll('[data-del-act]').forEach(b=>b.addEventListener('click', ()=>confirmDeleteActivity(b.dataset.delAct)));
+}
+
+async function updateActivityStatus(activityId, selectEl){
+  if(!can(currentUser,'edit_activity') || isViewerOnly(currentUser)){
+    toast('Kamu tidak punya akses untuk mengubah status.', true);
+    await syncActivities(); renderActivityTable(); return;
+  }
+  const activity=STATE.activities.find(a=>String(a.id)===String(activityId));
+  if(!activity) return;
+  const oldStatus=activity.status||'Belum ada status';
+  const newStatus=selectEl.value;
+  if(newStatus===oldStatus) return;
+  selectEl.disabled=true; selectEl.classList.add('saving'); selectEl.title='Menyimpan status…';
+  try{
+    const {error}=await supabaseClient.from('activities')
+      .update({status:newStatus,updated_at:new Date().toISOString()})
+      .eq('id',activityId);
+    if(error) throw error;
+    activity.status=newStatus;
+    activity.updatedAt=new Date().toISOString();
+    addAudit('UBAH STATUS PROKER',`Mengubah status "${activity.nama}" dari "${oldStatus}" menjadi "${newStatus}"`);
+    renderActivityTable(); renderTimeline(); renderStats(); renderCalendar(); renderAttachments();
+    toast('Status proker berhasil diperbarui.');
+  }catch(err){
+    console.error('Update activity status error:',err);
+    selectEl.value=oldStatus;
+    toast(`Status gagal disimpan: ${err?.message||'periksa koneksi atau izin database.'}`,true);
+  }finally{
+    selectEl.disabled=false; selectEl.classList.remove('saving'); selectEl.title='';
+  }
 }
 
 ['searchActivity','filterStatus','filterDivisi','filterBulan','filterTanggal'].forEach(id=>{
@@ -1777,15 +1950,33 @@ function renderAttachments(){
   }).join('');
   tbody.querySelectorAll('[data-view-att]').forEach(b=>b.addEventListener('click', ()=>viewOrDownloadAttachment(b.dataset.viewAtt,false)));
   tbody.querySelectorAll('[data-dl-att]').forEach(b=>b.addEventListener('click', ()=>viewOrDownloadAttachment(b.dataset.dlAtt,true)));
-  tbody.querySelectorAll('[data-del-att]').forEach(b=>b.addEventListener('click', ()=>{
+  tbody.querySelectorAll('[data-del-att]').forEach(b=>b.addEventListener('click', async ()=>{
     if(!can(currentUser,'manage_attachment') && currentUser.role!=='Admin'){ toast('Maaf, kamu belum punya akses untuk melakukan ini.', true); return; }
+    if(isViewerOnly(currentUser)){ toast('Mode Viewer Only: lampiran tidak bisa dihapus.',true); return; }
     const [actId, attId] = b.dataset.delAtt.split('|');
-    const a = STATE.activities.find(x=>x.id===actId); if(!a) return;
-    a.attachments = a.attachments.filter(x=>x.id!==attId);
-    saveState();
-    addAudit('HAPUS LAMPIRAN', `Menghapus lampiran dari kegiatan "${a.nama}"`);
-    toast('Lampiran dihapus.');
-    renderAttachments();
+    const a = STATE.activities.find(x=>String(x.id)===String(actId)); if(!a) return;
+    const att = (a.attachments||[]).find(x=>String(x.id)===String(attId)); if(!att) return;
+    if(!confirm(`Hapus lampiran "${att.fileName}" dari kegiatan "${a.nama}"?`)) return;
+    const originalText=b.title; b.disabled=true; b.title='Menghapus…'; b.style.opacity='.5';
+    try{
+      // Update the canonical Supabase row first. Never report success based only on local state.
+      const nextAttachments=(a.attachments||[]).filter(x=>String(x.id)!==String(attId));
+      const {error}=await supabaseClient.from('activities')
+        .update({attachments:nextAttachments,updated_at:new Date().toISOString()})
+        .eq('id',actId);
+      if(error) throw error;
+      a.attachments=nextAttachments;
+      a.updatedAt=new Date().toISOString();
+      addAudit('HAPUS LAMPIRAN',`Menghapus lampiran "${att.fileName}" dari kegiatan "${a.nama}"`);
+      renderAttachments(); renderActivityTable();
+      toast('Lampiran berhasil dihapus.');
+    }catch(err){
+      console.error('Delete attachment error:',err);
+      toast(`Lampiran gagal dihapus: ${err?.message||'periksa koneksi atau izin database.'}`,true);
+      try{await syncActivities();renderAttachments();renderActivityTable();}catch(syncErr){console.error('Refresh after attachment delete failed:',syncErr);}
+    }finally{
+      if(b.isConnected){b.disabled=false;b.title=originalText;b.style.opacity='';}
+    }
   }));
 }
 function viewOrDownloadAttachment(key, download){
@@ -2121,7 +2312,7 @@ function currentViewName(){
 }
 
 /* ================= LOGIN FLOW ================= */
-document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const errEl=document.getElementById('loginError'),submitBtn=e.target.querySelector('button[type=submit]');errEl.textContent='';try{const username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value;if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='Memproses...'}const result=await login(username,password);if(!result.ok){errEl.textContent=result.msg;return}currentUser=result.user;enterApp();try{await Promise.race([syncProfiles(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi profil')),5000))]);currentUser=STATE.users.find(u=>u.id===result.user.id)||result.user}catch(syncErr){console.error('Profile sync after login:',syncErr)}try{await Promise.race([syncActivities(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi kegiatan')),7000))])}catch(syncErr){console.error('Activity sync after login:',syncErr)}subscribeRealtime();renderCurrentView(currentViewName())}catch(err){console.error('Login error:',err);errEl.textContent=`Login technical error: ${err?.message||String(err)}`}finally{if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Masuk'}}});
+document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const errEl=document.getElementById('loginError'),submitBtn=e.target.querySelector('button[type=submit]');errEl.textContent='';try{const username=document.getElementById('loginUsername').value.trim(),password=document.getElementById('loginPassword').value;if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='Memproses...'}const result=await login(username,password);if(!result.ok){errEl.textContent=result.msg;return}currentUser=result.user;enterApp();try{await Promise.race([syncProfiles(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi profil')),5000))]);currentUser=STATE.users.find(u=>u.id===result.user.id)||result.user}catch(syncErr){console.error('Profile sync after login:',syncErr)}try{await Promise.race([syncActivities(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi kegiatan')),7000))])}catch(syncErr){console.error('Activity sync after login:',syncErr)}try{await syncSharedNotes()}catch(noteErr){console.error('Shared notes sync after login:',noteErr);toast('Catatan bersama belum dapat dimuat. Cek tabel/izin Supabase.',true)}subscribeRealtime();renderSharedNotes();renderCurrentView(currentViewName())}catch(err){console.error('Login error:',err);errEl.textContent=`Login technical error: ${err?.message||String(err)}`}finally{if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Masuk'}}});
 function enterApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('chipName').textContent=currentUser.name;applyBranding();applyNavPermissions();populateDivisionFilter();goToView('beranda')}
 document.getElementById('btnLogout').addEventListener('click',async()=>{try{await addAudit('LOGOUT','Keluar dari dashboard')}catch(e){}await supabaseClient.auth.signOut();if(realtimeChannel){await supabaseClient.removeChannel(realtimeChannel);realtimeChannel=null;}currentUser=null;document.getElementById('app').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('loginForm').reset()});
 async function init(){
@@ -2138,7 +2329,9 @@ async function init(){
         enterApp();
         try{await Promise.race([syncProfiles(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi profil')),5000))]);currentUser=STATE.users.find(u=>u.id===profile.id)||currentUser}catch(syncErr){console.error('Profile sync on init:',syncErr)}
         try{await Promise.race([syncActivities(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout sinkronisasi kegiatan')),7000))])}catch(syncErr){console.error('Activity sync on init:',syncErr)}
+        try{await syncSharedNotes()}catch(noteErr){console.error('Shared notes sync on init:',noteErr)}
         subscribeRealtime();
+        renderSharedNotes();
         renderCurrentView(currentViewName());
         return;
       }
