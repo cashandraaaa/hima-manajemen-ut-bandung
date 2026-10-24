@@ -221,13 +221,13 @@ a{color:inherit;}
 .cal-nav button{width:30px; height:30px; border-radius:8px; background:var(--card-2); border:1px solid var(--border); color:var(--text-hi); font-size:14px;}
 .cal-nav button:hover{background:var(--card-hover);}
 .cal-nav .cal-month{font-weight:700; font-size:13.5px; min-width:120px; text-align:center;}
-.cal-weekdays{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; margin-bottom:6px; min-width:0;}
+.cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:6px;}
 .cal-weekdays span{text-align:center; font-size:11px; font-weight:700; color:var(--text-dim);}
-.cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; min-width:0; width:100%; box-sizing:border-box;}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
 .cal-cell{
-  min-width:0; min-height:58px; border-radius:8px; background:var(--card-2);
-  border:1px solid var(--border-soft); padding:5px 4px; font-size:12px;
-  position:relative; cursor:default; overflow:hidden; box-sizing:border-box;
+  min-height:58px; border-radius:10px; background:var(--card-2);
+  border:1px solid var(--border-soft); padding:6px 6px; font-size:12px;
+  position:relative; cursor:default;
 }
 .cal-cell.empty{background:transparent; border-color:transparent;}
 .cal-cell.has-event{cursor:pointer;}
@@ -253,9 +253,9 @@ a{color:inherit;}
 .cal-legend-item .dot{width:8px; height:8px; border-radius:50%;}
 #calDayDetail{margin-top:14px;}
 .cal-event-labels{display:flex;flex-direction:column;gap:2px;margin-top:4px;min-width:0;}
-.cal-event-label{display:block;max-width:100%;min-width:0;box-sizing:border-box;font-size:10px;line-height:1.25;padding:2px 3px;border-radius:3px;background:var(--bg-2);color:var(--text-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:2px solid var(--blue);}
+.cal-event-label{font-size:10px;line-height:1.25;padding:2px 3px;border-radius:3px;background:var(--bg-2);color:var(--text-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:2px solid var(--blue);}
 .cal-event-more{font-size:9px;color:var(--text-mid);padding-left:3px;}
-@media(max-width:600px){.cal-weekdays{gap:2px}.cal-grid{gap:2px}.cal-cell{min-height:54px;padding:4px 2px;border-radius:6px}.cal-daynum{font-size:10px}.cal-event-label{font-size:8px;line-height:1.15;padding:2px 1px;border-left-width:1px}.cal-event-labels{gap:1px}.cal-dots{gap:2px;margin-top:4px}}
+@media(max-width:600px){.cal-event-label{font-size:8px;padding:2px 1px}.cal-event-labels{gap:1px}}
 
 /* ============ SHARED NOTES / REMINDERS ============ */
 .notes-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.9fr);gap:16px;align-items:start;}
@@ -830,13 +830,14 @@ table.data-table tr:hover td{background:rgba(255,255,255,0.015);}
       <!-- ===== BACKUP ===== -->
       <section class="view" id="view-backup">
         <div class="section-card">
-          <div class="section-head"><div><h3>💾 Backup &amp; Restore</h3><p>Amankan data HIMA, atau pulihkan dari backup sebelumnya.</p></div></div>
+          <div class="section-head"><div><h3>💾 Backup &amp; Restore</h3><p>PDF untuk dibaca/ dicetak; JSON untuk memulihkan data jika diperlukan.</p></div></div>
           <div class="section-actions" style="margin-bottom:18px;">
             <select class="select-filter" id="backupBulan" title="Pilih bulan untuk backup terpisah">
               <option value="">Semua Data</option>
             </select>
-            <button class="btn btn-primary btn-sm" id="btnBackupNow">💾 Backup Pilihan</button>
-            <button class="btn btn-ghost btn-sm" id="btnBackupCurrentMonth">📦 Backup Bulan Terpilih</button>
+            <button class="btn btn-primary btn-sm" id="btnBackupNow">💾 Backup Pemulihan (JSON)</button>
+            <button class="btn btn-ghost btn-sm" id="btnBackupCurrentMonth">📦 Backup Bulan (JSON)</button>
+            <button class="btn btn-ghost btn-sm" id="btnExportPDF">📄 Cetak / Simpan PDF</button>
             <button class="btn btn-ghost btn-sm" id="btnExportCSV">📤 Export CSV</button>
             <label class="btn btn-ghost btn-sm" style="margin:0;">📂 Import Data<input type="file" id="fileRestoreInput" accept=".json" style="display:none;"></label>
           </div>
@@ -1538,7 +1539,7 @@ function renderCalendar(){
     }
     const cell = document.createElement('div');
     cell.className = 'cal-cell' + (evs.length? ' has-event':'') + (colorClass? ' '+colorClass:'') + (iso===todayStr? ' today':'') + (iso===calSelectedDate? ' selected':'');
-    cell.innerHTML = `<div class="cal-daynum">${d}</div>${evs.length>=2? '<span class="cal-multi-flag" title="2 atau lebih kegiatan">●</span>':''}<div class="cal-dots">${evs.slice(0,4).map(e=>`<span class="cal-dot" style="background:${STATUS_COLOR[e.status]||'var(--blue)'}" title="${escapeHtml(e.nama)} — ${escapeHtml(e.status||'Belum ada status')}"></span>`).join('')}</div>${evs.length?`<div class="cal-event-labels">${evs.slice(0,2).map(e=>`<div class="cal-event-label" title="${escapeHtml(e.nama)} · ${escapeHtml(e.divisi||'Divisi belum ditentukan')} · ${escapeHtml(e.status||'Belum ada status')}">${escapeHtml(e.divisi||'Divisi belum ditentukan')}</div>`).join('')}${evs.length>2?`<div class="cal-event-more">+${evs.length-2} lagi</div>`:''}</div>`:''}`;
+    cell.innerHTML = `<div class="cal-daynum">${d}</div>${evs.length>=2? '<span class="cal-multi-flag" title="2 atau lebih kegiatan">●</span>':''}<div class="cal-dots">${evs.slice(0,4).map(e=>`<span class="cal-dot" style="background:${STATUS_COLOR[e.status]||'var(--blue)'}" title="${escapeHtml(e.nama)} — ${escapeHtml(e.status||'Belum ada status')}"></span>`).join('')}</div>${evs.length?`<div class="cal-event-labels">${evs.slice(0,2).map(e=>`<div class="cal-event-label" title="${escapeHtml(e.nama)} · ${escapeHtml(e.status||'Belum ada status')}">${escapeHtml(e.nama)}</div>`).join('')}${evs.length>2?`<div class="cal-event-more">+${evs.length-2} lagi</div>`:''}</div>`:''}`;
     if(evs.length) cell.addEventListener('click', ()=>{ calSelectedDate = iso; renderCalendar(); renderCalDayDetail(iso); });
     grid.appendChild(cell);
   }
@@ -2154,6 +2155,35 @@ function doBackup(scopeKey){
   renderBackupHistory();
 }
 
+function exportDataPDF(){
+  if(!can(currentUser,'export') && !can(currentUser,'backup')){ toast('Maaf, kamu belum punya akses untuk mengekspor data.', true); return; }
+  const scope=document.getElementById('backupBulan')?.value||'';
+  const activities=(scope?STATE.activities.filter(a=>activityMonthKeys(a).includes(scope)):STATE.activities).slice().sort((a,b)=>String(a.tanggal||'9999-99-99').localeCompare(String(b.tanggal||'9999-99-99')));
+  const title=scope?`Data HIMA — ${monthLabel(scope)}`:'Data HIMA — Semua Periode';
+  const esc=(v)=>escapeHtml(String(v??'-')).replace(/\n/g,'<br>');
+  const rows=activities.map((a,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${esc(a.nama||'Kegiatan tanpa nama')}</strong><br><span class="muted">${esc(a.divisi||'Divisi belum diisi')}</span></td>
+      <td>${esc(displayDateRange(a))}${a.waktu?`<br>${esc(a.waktu)}`:''}</td>
+      <td>${esc(a.lokasi||'-')}</td>
+      <td>${esc(a.pic||'-')}</td>
+      <td><span class="status">${esc(a.status||'Belum ditentukan')}</span></td>
+      <td>${esc(a.deskripsi||'-')}${a.catatan?`<br><span class="muted"><strong>Catatan:</strong> ${esc(a.catatan)}</span>`:''}${Array.isArray(a.attachments)&&a.attachments.length?`<br><span class="muted"><strong>Lampiran:</strong> ${a.attachments.map(x=>esc(x.fileName||x.name||'Lampiran')).join(', ')}</span>`:''}</td>
+    </tr>`).join('');
+  const notes=(Array.isArray(STATE.notes)?STATE.notes:[]).filter(n=>!scope || !n.remindAt || String(n.remindAt).slice(0,7)===scope);
+  const noteSection=notes.length?`<section><h2>Catatan Bersama</h2>${notes.map(n=>`<article class="note"><h3>${esc(n.title||n.category||'Catatan')}</h3><p>${esc(n.body||'')}</p><small>${esc(n.category||'Informasi')} · ${esc(n.createdByName||'Pengguna')} · ${esc(n.createdAt?fmtDateTime(n.createdAt):'-')}</small></article>`).join('')}</section>`:'';
+  const w=window.open('','_blank');
+  if(!w){toast('Jendela PDF diblokir browser. Izinkan pop-up untuk situs HIMA lalu coba lagi.',true);return;}
+  w.document.open();
+  w.document.write(`<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>
+    @page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#172033;margin:0;font-size:10px;line-height:1.45}header{border-bottom:2px solid #253858;padding-bottom:10px;margin-bottom:16px}h1{font-size:20px;margin:0 0 4px}header p{margin:0;color:#526078;font-size:10px}.summary{margin:10px 0 14px;padding:8px 10px;background:#f2f5fa;border:1px solid #dce3ee;border-radius:5px}h2{font-size:14px;margin:18px 0 8px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #d7deea;padding:6px;vertical-align:top;overflow-wrap:anywhere}th{background:#edf1f7;text-align:left;font-size:9px}td{font-size:9px}th:nth-child(1){width:3%}th:nth-child(2){width:17%}th:nth-child(3){width:12%}th:nth-child(4){width:12%}th:nth-child(5){width:11%}th:nth-child(6){width:9%}th:nth-child(7){width:36%}.muted{color:#5d687b;font-size:8.5px}.status{font-weight:bold}.note{border:1px solid #d7deea;border-radius:5px;padding:8px 10px;margin:7px 0;break-inside:avoid}.note h3{font-size:11px;margin:0 0 4px}.note p{white-space:pre-wrap;margin:0 0 5px}.note small{color:#5d687b}.footer{margin-top:16px;color:#667085;font-size:8px;text-align:right}@media print{.no-print{display:none}}
+  </style></head><body><header><h1>HIMA Manajemen UT Bandung</h1><p>${esc(title)} · Dicetak ${esc(new Date().toLocaleString('id-ID'))}</p></header><div class="summary"><strong>Ringkasan:</strong> ${activities.length} kegiatan${scope?` untuk periode ${esc(monthLabel(scope))}`:' dari semua periode'}.</div><h2>Data Kegiatan / Program Kerja</h2>${activities.length?`<table><thead><tr><th>No.</th><th>Kegiatan / Divisi</th><th>Tanggal / Waktu</th><th>Lokasi</th><th>PIC</th><th>Status</th><th>Deskripsi / Catatan / Lampiran</th></tr></thead><tbody>${rows}</tbody></table>`:'<p>Belum ada data kegiatan pada periode ini.</p>'}${noteSection}<p class="footer">Dokumen laporan data HIMA · Tidak memuat kode program.</p><div class="no-print" style="margin-top:18px"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button> <button onclick="window.close()">Tutup</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350);<\/script></body></html>`);
+  w.document.close();
+  addAudit('EXPORT PDF',`Mencetak laporan PDF ${scope?monthLabel(scope):'semua data'}`);
+  toast('Laporan dibuka. Pilih “Simpan sebagai PDF” pada menu cetak.');
+}
+
 function exportCSV(){
   if(!can(currentUser,'export')){ toast('Maaf, kamu belum punya akses untuk melakukan ini.', true); return; }
   const header = ['No','Divisi','Kegiatan','Tanggal Mulai','Tanggal Selesai','Status','Penanggung Jawab'];
@@ -2235,6 +2265,7 @@ document.getElementById('btnBackupCurrentMonth').addEventListener('click', ()=>{
   doBackup(key);
 });
 document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+document.getElementById('btnExportPDF').addEventListener('click', exportDataPDF);
 
 /* ================= USER MANAGEMENT ================= */
 function renderUserTable(){
