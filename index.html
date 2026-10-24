@@ -210,7 +210,6 @@ a{color:inherit;}
 .section-card{
   background:var(--card); border:1px solid var(--border-soft);
   border-radius:var(--radius-lg); padding:20px; margin-bottom:18px;
-  min-width:0; max-width:100%; box-sizing:border-box;
 }
 .section-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
 .section-head h3{font-size:15.5px; font-weight:700; display:flex; align-items:center; gap:8px;}
@@ -222,13 +221,13 @@ a{color:inherit;}
 .cal-nav button{width:30px; height:30px; border-radius:8px; background:var(--card-2); border:1px solid var(--border); color:var(--text-hi); font-size:14px;}
 .cal-nav button:hover{background:var(--card-hover);}
 .cal-nav .cal-month{font-weight:700; font-size:13.5px; min-width:120px; text-align:center;}
-.cal-weekdays{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-bottom:6px; min-width:0; width:100%; box-sizing:border-box;}
+.cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:6px;}
 .cal-weekdays span{text-align:center; font-size:11px; font-weight:700; color:var(--text-dim);}
-.cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; min-width:0; width:100%; max-width:100%; box-sizing:border-box;}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
 .cal-cell{
   min-height:58px; border-radius:10px; background:var(--card-2);
   border:1px solid var(--border-soft); padding:6px 6px; font-size:12px;
-  position:relative; cursor:default; min-width:0; max-width:100%; box-sizing:border-box; overflow:hidden;
+  position:relative; cursor:default;
 }
 .cal-cell.empty{background:transparent; border-color:transparent;}
 .cal-cell.has-event{cursor:pointer;}
@@ -256,7 +255,7 @@ a{color:inherit;}
 .cal-event-labels{display:flex;flex-direction:column;gap:2px;margin-top:4px;min-width:0;}
 .cal-event-label{font-size:10px;line-height:1.25;padding:2px 3px;border-radius:3px;background:var(--bg-2);color:var(--text-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:2px solid var(--blue);}
 .cal-event-more{font-size:9px;color:var(--text-mid);padding-left:3px;}
-@media(max-width:600px){.section-card{padding:12px}.cal-weekdays,.cal-grid{gap:3px}.cal-cell{padding:4px 2px;min-height:48px;border-radius:6px}.cal-event-label{font-size:7px;padding:2px 1px}.cal-event-labels{gap:1px;min-width:0}.cal-event-label{max-width:100%}.cal-nav{gap:5px}.cal-nav .cal-month{min-width:0;font-size:12px}}
+@media(max-width:600px){.cal-event-label{font-size:8px;padding:2px 1px}.cal-event-labels{gap:1px}}
 
 /* ============ SHARED NOTES / REMINDERS ============ */
 .notes-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.9fr);gap:16px;align-items:start;}
@@ -831,7 +830,7 @@ table.data-table tr:hover td{background:rgba(255,255,255,0.015);}
       <!-- ===== BACKUP ===== -->
       <section class="view" id="view-backup">
         <div class="section-card">
-          <div class="section-head"><div><h3>💾 Backup &amp; Restore</h3><p>PDF untuk dibaca/ dicetak; JSON untuk memulihkan data jika diperlukan.</p></div></div>
+          <div class="section-head"><div><h3>💾 Backup &amp; Restore</h3><p>Amankan data HIMA, atau pulihkan dari backup sebelumnya.</p></div></div>
           <div class="section-actions" style="margin-bottom:18px;">
             <select class="select-filter" id="backupBulan" title="Pilih bulan untuk backup terpisah">
               <option value="">Semua Data</option>
@@ -2184,6 +2183,7 @@ function exportDataPDF(){
   addAudit('EXPORT PDF',`Mencetak laporan PDF ${scope?monthLabel(scope):'semua data'}`);
   toast('Laporan dibuka. Pilih “Simpan sebagai PDF” pada menu cetak.');
 }
+
 
 function exportCSV(){
   if(!can(currentUser,'export')){ toast('Maaf, kamu belum punya akses untuk melakukan ini.', true); return; }
